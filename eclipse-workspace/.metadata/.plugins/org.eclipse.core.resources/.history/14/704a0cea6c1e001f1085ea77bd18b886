@@ -1,0 +1,60 @@
+package hadiEncoder;
+
+public class CharacterShifter {
+
+	  private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*.+,-./";
+
+	  public String encode(String plainText, char offset) {
+	    StringBuilder encodedText = new StringBuilder();
+	    encodedText.append(offset);
+
+	    for (char character : plainText.toCharArray()) {
+	      int index = REFERENCE_TABLE.indexOf(character);
+	      if (index != -1) {
+	        int shiftedIndex = (index + 1 - offset + REFERENCE_TABLE.length()) % REFERENCE_TABLE.length();
+	        encodedText.append(REFERENCE_TABLE.charAt(shiftedIndex));
+	      } else {
+	        encodedText.append(character);
+	      }
+	    }
+	    return encodedText.toString();
+	  }
+
+	  public String decode(String encodedText) {
+	    char offset = encodedText.charAt(0);
+	    StringBuilder decodedText = new StringBuilder();
+
+	    for (int i = 1; i < encodedText.length(); i++) {
+	      char character = encodedText.charAt(i);
+	      int index = REFERENCE_TABLE.indexOf(character);
+	      if (index != -1) {
+	        int shiftedIndex = (index - 1 + offset + REFERENCE_TABLE.length()) % REFERENCE_TABLE.length();
+	        decodedText.append(REFERENCE_TABLE.charAt(shiftedIndex));
+	      } else {
+	        decodedText.append(character);
+	      }
+	    }
+	    return decodedText.toString();
+	  }
+
+	  // Example usage (can be placed in a separate class)
+	  public static void main(String[] args) {
+	    CharacterShifter shifter = new CharacterShifter();
+	    String plainText = "HELLO WORLD (TEST)";
+	    char offset1 = 'B';
+	    char offset2 = 'F';
+
+	    String encodedText1 = shifter.encode(plainText, offset1);
+	    String encodedText2 = shifter.encode(plainText, offset2);
+
+	    System.out.println("Plaintext: " + plainText);
+	    System.out.println("Encoded with offset " + offset1 + ": " + encodedText1);
+	    System.out.println("Encoded with offset " + offset2 + ": " + encodedText2);
+
+	    String decodedText1 = shifter.decode(encodedText1);
+	    String decodedText2 = shifter.decode(encodedText2);
+
+	    System.out.println("Decoded from " + encodedText1 + ": " + decodedText1);
+	    System.out.println("Decoded from " + encodedText2 + ": " + decodedText2);
+	  }
+	}

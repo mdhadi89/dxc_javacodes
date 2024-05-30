@@ -1,0 +1,94 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Encoder {
+    private static final char[] referenceTable = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'
+    };
+    private static final int TABLE_SIZE = referenceTable.length;
+
+    private Map<Character, Integer> charToIndexMap;
+
+    public Encoder() {
+        charToIndexMap = new HashMap<>();
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            charToIndexMap.put(referenceTable[i], i);
+        }
+    }
+
+    private char shiftChar(char c, int offset) {
+        if (charToIndexMap.containsKey(c)) {
+            int originalIndex = charToIndexMap.get(c);
+            int newIndex = (originalIndex + offset) % TABLE_SIZE;
+            return referenceTable[newIndex];
+        }
+        return c;  // Characters not in the reference table are unchanged
+    }
+
+    private char unshiftChar(char c, int offset) {
+        if (charToIndexMap.containsKey(c)) {
+            int encodedIndex = charToIndexMap.get(c);
+            int originalIndex = (encodedIndex - offset + TABLE_SIZE) % TABLE_SIZE;
+            return referenceTable[originalIndex];
+        }
+        return c;  // Characters not in the reference table are unchanged
+    }
+
+    public String encode(String plainText) {
+        if (plainText == null || plainText.isEmpty()) {
+            return plainText;
+        }
+
+        char offsetChar = plainText.charAt(0);
+        int offset = charToIndexMap.get(offsetChar);
+
+        StringBuilder encodedText = new StringBuilder();
+        encodedText.append(offsetChar);  // Add the offset character at the beginning
+
+        for (int i = 0; i < plainText.length(); i++) {
+            char c = plainText.charAt(i);
+            encodedText.append(shiftChar(c, offset));
+        }
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText) {
+        if (encodedText == null || encodedText.isEmpty()) {
+            return encodedText;
+        }
+
+        char offsetChar = encodedText.charAt(0);
+        int offset = charToIndexMap.get(offsetChar);
+
+        StringBuilder decodedText = new StringBuilder();
+
+        for (int i = 1; i < encodedText.length(); i++) {
+            char c = encodedText.charAt(i);
+            decodedText.append(unshiftChar(c, offset));
+        }
+        return decodedText.toString();
+    }
+
+    public static void main(String[] args) {
+        Encoder encoder = new Encoder();
+
+        // Test case with 'B' as the offset character
+        String plainTextB = "HELLO WORLD";
+        String encodedTextB = encoder.encode("B" + plainTextB);
+        System.out.println("Encoded Text with 'B' offset: " + encodedTextB); // Expected: "BGDKKN VNQKC"
+
+        String decodedTextB = encoder.decode(encodedTextB);
+        System.out.println("Decoded Text: " + decodedTextB); // Expected: "HELLO WORLD"
+
+        // Test case with 'F' as the offset character
+        String plainTextF = "HELLO WORLD";
+        String encodedTextF = encoder.encode("F" + plainTextF);
+        System.out.println("Encoded Text with 'F' offset: " + encodedTextF); // Expected: "FCGGJ RJMG."
+
+        String decodedTextF = encoder.decode(encodedTextF);
+        System.out.println("Decoded Text: " + decodedTextF); // Expected: "HELLO WORLD"
+    }
+}

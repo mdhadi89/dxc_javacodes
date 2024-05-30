@@ -1,0 +1,77 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Encoder {
+    private static final char[] referenceTable = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'
+    };
+    private static final int TABLE_SIZE = referenceTable.length;
+    private Map<Character, Integer> charToIndexMap;
+
+    public Encoder() {
+        charToIndexMap = new HashMap<>();
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            charToIndexMap.put(referenceTable[i], i);
+        }
+    }
+
+    public String encode(String plainText) {
+        if (plainText == null || plainText.isEmpty()) {
+            return plainText;
+        }
+
+        char offsetChar = plainText.charAt(0);
+        int offset = charToIndexMap.get(offsetChar);
+
+        StringBuilder encodedText = new StringBuilder();
+        encodedText.append(offsetChar);  // Add the offset character at the beginning
+
+        for (char c : plainText.toCharArray()) {
+            if (charToIndexMap.containsKey(c)) {
+                int originalIndex = charToIndexMap.get(c);
+                int newIndex = (originalIndex + offset) % TABLE_SIZE;
+                encodedText.append(referenceTable[newIndex]);
+            } else {
+                encodedText.append(c);  // Characters not in the reference table are unchanged
+            }
+        }
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText) {
+        if (encodedText == null || encodedText.isEmpty()) {
+            return encodedText;
+        }
+
+        char offsetChar = encodedText.charAt(0);
+        int offset = charToIndexMap.get(offsetChar);
+
+        StringBuilder decodedText = new StringBuilder();
+
+        for (int i = 1; i < encodedText.length(); i++) {
+            char c = encodedText.charAt(i);
+            if (charToIndexMap.containsKey(c)) {
+                int encodedIndex = charToIndexMap.get(c);
+                int originalIndex = (encodedIndex - offset + TABLE_SIZE) % TABLE_SIZE;
+                decodedText.append(referenceTable[originalIndex]);
+            } else {
+                decodedText.append(c);  // Characters not in the reference table are unchanged
+            }
+        }
+        return decodedText.toString();
+    }
+
+    public static void main(String[] args) {
+        Encoder encoder = new Encoder();
+        String plainText = "HELLO WORLD";
+        String encodedText = encoder.encode("B" + plainText);  // Assuming 'B' is the offset
+        System.out.println("Encoded Text: " + encodedText);
+
+        String decodedText = encoder.decode(encodedText);
+        System.out.println("Decoded Text: " + decodedText);
+    }
+}
+

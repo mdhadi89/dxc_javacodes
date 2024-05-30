@@ -1,0 +1,62 @@
+package hadiEncoder;
+
+public class Encoderrr {
+    private final String referenceTable;
+    private final String shiftTable;
+
+    public Encoderrr(String referenceTable, String shiftTable) {
+        this.referenceTable = referenceTable;
+        this.shiftTable = shiftTable;
+    }
+
+    public String encode(String plainText) {
+        StringBuilder encoded = new StringBuilder();
+        for (char c : plainText.toCharArray()) {
+            int index = referenceTable.indexOf(c);
+            if (index != -1) {
+                encoded.append(shiftTable.charAt(index));
+            } else {
+                encoded.append(c); // Character not in reference table
+            }
+        }
+        return encoded.toString();
+    }
+
+    public String decode(String encodedText) {
+        StringBuilder decoded = new StringBuilder();
+        for (char c : encodedText.toCharArray()) {
+            int index = shiftTable.indexOf(c);
+            if (index != -1) {
+                decoded.append(referenceTable.charAt(index));
+            } else {
+                decoded.append(c); // Character not in shift table
+            }
+        }
+        return decoded.toString();
+    }
+
+    public static void main(String[] args) {
+        String referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./";
+        String shiftTable1 = "/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-.";
+        String shiftTable2 = "+,-./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*";
+
+        Encoderrr encoderDecoder1 = new Encoderrr(referenceTable, shiftTable1);
+        Encoderrr encoderDecoder2 = new Encoderrr(referenceTable, shiftTable2);
+
+        String plaintext = "HELLO WORLD";
+
+        // Encode and decode using Shift Table #1
+        String encodedMessage1 = encoderDecoder1.encode(plaintext);
+        String decodedMessage1 = encoderDecoder1.decode(encodedMessage1);
+
+        // Encode and decode using Shift Table #2
+        String encodedMessage2 = encoderDecoder2.encode(plaintext);
+        String decodedMessage2 = encoderDecoder2.decode(encodedMessage2);
+
+        System.out.println("Encoded message (Shift Table #1): " + encodedMessage1);
+        System.out.println("Decoded message (Shift Table #1): " + decodedMessage1);
+        System.out.println("Encoded message (Shift Table #2): " + encodedMessage2);
+        System.out.println("Decoded message (Shift Table #2): " + decodedMessage2);
+    }
+}
+

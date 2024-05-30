@@ -1,0 +1,44 @@
+package com.mvc.controller;
+
+import java.io.IOException;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.mvc.bean.LoginBean;
+import com.mvc.dao.LoginDao;
+
+public class RestrictedServlet extends HttpServlet
+{
+	private static final long serialVersionUID = 1L;
+	 
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{ 
+	 HttpSession session = request.getSession(false); //Fetch session object
+
+		if(session!=null) //If session is not null
+		 {
+//			 RequestDispatcher requestDispatcher = request.getRequestDispatcher("/Manager.jsp");
+//			 requestDispatcher.forward(request, response);
+//			 System.out.println("Welcome to the Restricted Page!");
+			
+
+			String userName = request.getParameter("username");
+			String password = request.getParameter("password");
+
+			LoginBean loginBean = new LoginBean(); //creating object for LoginBean class, which is a normal java class, contains just setters and getters. Bean classes are efficiently used in java to access user information wherever required in the application.
+
+			loginBean.setUserName(userName); //setting the username and password through the loginBean object then we can get it in future.
+			loginBean.setPassword(password);
+
+			LoginDao loginDao = new LoginDao(); //creating object for LoginDao. This class contains main logic of the application.
+
+			session.setAttribute("Manager", userName); //setting session attribute
+			request.setAttribute("userName", userName);
+			request.getRequestDispatcher("Manager.jsp").forward(request, response);
+		 }
+	}
+}

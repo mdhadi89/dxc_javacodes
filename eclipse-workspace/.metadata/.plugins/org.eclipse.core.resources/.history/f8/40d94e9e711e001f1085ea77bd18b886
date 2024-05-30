@@ -1,0 +1,59 @@
+package hadiEncoder;
+
+	import java.util.HashMap;
+	import java.util.Map;
+
+	public class CharacterShifters {
+
+	    private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./"; // Reference table with 44 characters
+	    private static final String SHIFT_TABLE_1 = "/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-."; // Shift Table #1
+	    private static final String SHIFT_TABLE_2 = "+,-./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*"; // Shift Table #2
+
+	    // Create a map for easy lookup of character indices
+	    private static final Map<Character, Integer> charToIndex = new HashMap<>();
+	    static {
+	        for (int i = 0; i < REFERENCE_TABLE.length(); i++) {
+	            charToIndex.put(REFERENCE_TABLE.charAt(i), i);
+	        }
+	    }
+
+	    public static String encode(String plainText) {
+	        StringBuilder encodedText = new StringBuilder();
+	        for (char c : plainText.toUpperCase().toCharArray()) {
+	            if (charToIndex.containsKey(c)) {
+	                int index = charToIndex.get(c);
+	                char encodedChar = SHIFT_TABLE_1.charAt(index); // Use Shift Table #1
+	                encodedText.append(encodedChar);
+	            } else {
+	                encodedText.append(c); // Keep non-alphabetic characters unchanged
+	            }
+	        }
+	        return encodedText.toString();
+	    }
+
+	    public static String decode(String encodedText) {
+	        StringBuilder plainText = new StringBuilder();
+	        for (char c : encodedText.toUpperCase().toCharArray()) {
+	            if (charToIndex.containsKey(c)) {
+	                int index = charToIndex.get(c);
+	                char decodedChar = SHIFT_TABLE_2.charAt(index); // Use Shift Table #2
+	                plainText.append(decodedChar);
+	            } else {
+	                plainText.append(c); // Keep non-alphabetic characters unchanged
+	            }
+	        }
+	        return plainText.toString();
+	    }
+
+	    public static void main(String[] args) {
+	        String input = "HELLO WORLD";
+	        String encoded = encode(input);
+	        String decoded = decode(encoded);
+
+	        System.out.println("Input: " + input);
+	        System.out.println("Encoded: " + encoded);
+	        System.out.println("Decoded: " + decoded);
+	    }
+	}
+
+}

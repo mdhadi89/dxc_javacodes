@@ -1,0 +1,51 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Encoders {
+    private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./";
+    private static final String SHIFT_TABLE_1 = "/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-.";
+    private static final String SHIFT_TABLE_2 = "+,-./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*";
+
+    public static void main(String[] args) {
+        String plaintext = "BHELLO WORLD";
+        char offsetCharacter = 'B'; // You can choose any character from the reference table
+
+        String encodedMessage = encode(plaintext, offsetCharacter);
+        System.out.println("Encoded message: " + encodedMessage);
+
+        String decodedMessage = decode(encodedMessage, offsetCharacter);
+        System.out.println("Decoded message: " + decodedMessage);
+    }
+
+    public static String encode(String plainText, char offsetCharacter) {
+        StringBuilder encoded = new StringBuilder();
+        String shiftTable = (offsetCharacter == 'B') ? SHIFT_TABLE_1 : SHIFT_TABLE_2;
+
+        for (char c : plainText.toCharArray()) {
+            int index = REFERENCE_TABLE.indexOf(c);
+            if (index != -1) {
+                encoded.append(shiftTable.charAt(index));
+            } else {
+                encoded.append(c); // Character not in reference table
+            }
+        }
+        return encoded.toString();
+    }
+
+    public static String decode(String encodedText, char offsetCharacter) {
+        StringBuilder decoded = new StringBuilder();
+        String shiftTable = (offsetCharacter == 'B') ? SHIFT_TABLE_1 : SHIFT_TABLE_2;
+
+        for (char c : encodedText.toCharArray()) {
+            int index = shiftTable.indexOf(c);
+            if (index != -1) {
+                decoded.append(REFERENCE_TABLE.charAt(index));
+            } else {
+                decoded.append(c); // Character not in shift table
+            }
+        }
+        return decoded.toString();
+    }
+}

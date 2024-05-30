@@ -1,0 +1,127 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class EncoderDecoder {
+    private final char[] referenceTable;
+    private final Map<Character, char[]> shiftTables;
+
+    public EncoderDecoder(char[] referenceTable, Map<Character, char[]> shiftTables) {
+        this.referenceTable = referenceTable;
+        this.shiftTables = shiftTables;
+    }
+
+    public String encode(String plainText, char offsetChar) {
+        StringBuilder encodedText = new StringBuilder();
+
+        // Check if offset character exists in shift tables
+        if (!shiftTables.containsKey(offsetChar)) {
+            return plainText; // If offset character not found, return plaintext unchanged
+        }
+
+        char[] shiftTable = shiftTables.get(offsetChar);
+        int offsetIndex = findOffsetIndex(offsetChar);
+
+        for (char c : plainText.toCharArray()) {
+            int index = findIndex(c);
+            if (index != -1) {
+                encodedText.append(shiftTable[(index + offsetIndex) % referenceTable.length]);
+            } else {
+                // Character not found in reference table, keep it unchanged
+                encodedText.append(c);
+            }
+        }
+
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText) {
+        if (encodedText.isEmpty()) {
+            return ""; // If encoded text is empty, return empty string
+        }
+
+        char offsetChar = encodedText.charAt(0); // Offset character is the first character of the encoded text
+
+        // Check if offset character exists in shift tables
+        if (!shiftTables.containsKey(offsetChar)) {
+            return encodedText.substring(1); // If offset character not found, return encoded text without offset character
+        }
+
+        StringBuilder decodedText = new StringBuilder();
+        char[] shiftTable = shiftTables.get(offsetChar);
+        int offsetIndex = findOffsetIndex(offsetChar);
+
+        for (char c : encodedText.substring(1).toCharArray()) {
+            int index = findIndex(c, shiftTable);
+            if (index != -1) {
+                int originalIndex = (index - offsetIndex + referenceTable.length) % referenceTable.length;
+                decodedText.append(referenceTable[originalIndex]);
+            } else {
+                // Character not found in shift table, keep it unchanged
+                decodedText.append(c);
+            }
+        }
+
+        return decodedText.toString();
+    }
+
+    private int findOffsetIndex(char offsetChar) {
+        for (int i = 0; i < referenceTable.length; i++) {
+            if (referenceTable[i] == offsetChar) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findIndex(char c) {
+        for (int i = 0; i < referenceTable.length; i++) {
+            if (referenceTable[i] == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int findIndex(char c, char[] table) {
+        for (int i = 0; i < table.length; i++) {
+            if (table[i] == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        char[] referenceTable = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'
+        };
+
+        Map<Character, char[]> shiftTables = new HashMap<>();
+        shiftTables.put('B', new char[] {'/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.'});
+        shiftTables.put('F', new char[] {'+', ',', '-', '.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*'});
+
+        EncoderDecoder encoderDecoder = new EncoderDecoder(referenceTable, shiftTables);
+
+        String plainText = "HELLO WORLD";
+
+        // Encode with offset character B
+        String encodedTextB = encoderDecoder.encode(plainText, 'B');
+        System.out.println("Encoded with offset B: " + encodedTextB);
+
+        // Decode with offset character B
+        String decodedTextB = encoderDecoder.decode(encodedTextB);
+        System.out.println("Decoded with offset B: " + decodedTextB);
+
+        // Encode with offset character F
+        String encodedTextF = encoderDecoder.encode(plainText, 'F');
+        System.out.println("Encoded with offset F: " + encodedTextF);
+
+        // Decode with offset character F
+        String decodedTextF = encoderDecoder.decode(encodedTextF);
+        System.out.println("Decoded with offset F: " + decodedTextF);
+    }
+}

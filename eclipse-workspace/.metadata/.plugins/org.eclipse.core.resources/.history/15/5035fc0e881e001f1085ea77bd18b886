@@ -1,0 +1,64 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><fmt:message key="login.title"/></title>
+    <script> 
+        function validate() { 
+            var username = document.form.username.value; 
+            var password = document.form.password.value;
+            if (username==null || username=="") { 
+                alert("<fmt:message key='login.username.blank'/>"); 
+                return false; 
+            } else if (password==null || password=="") { 
+                alert("<fmt:message key='login.password.blank'/>"); 
+                return false; 
+            } 
+        }
+
+        function changeLanguage() {
+            var language = document.getElementById("languageSelect").value;
+            // You can perform an action based on the selected language,
+            // like submitting a form to change the language preference.
+            // For simplicity, let's reload the page with a query parameter.
+            window.location.href = "?lang=" + language;
+        }
+    </script> 
+</head>
+<body>
+    <div style="text-align:center"><h1><fmt:message key="login.heading"/></h1></div>
+    <br>
+    <form name="form" action="LoginServlet" method="post" onsubmit="return validate()">
+        <table align="center">
+            <tr>
+                <td><fmt:message key="login.username.label"/></td>
+                <td><input type="text" name="username" /></td>
+            </tr>
+            <tr>
+                <td><fmt:message key="login.password.label"/></td>
+                <td><input type="password" name="password" /></td>
+            </tr>
+            <tr>
+                <td><span style="color:red"><c:out value="${requestScope.errMessage}"/></span></td>
+            </tr>
+            <tr>
+                <td><fmt:message key="login.language.label"/></td>
+                <td>
+                    <select id="languageSelect" onchange="changeLanguage()">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="<fmt:message key='login.submit'/>">&nbsp&nbsp
+                    <input type="reset" value="<fmt:message key='login.reset'/>"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

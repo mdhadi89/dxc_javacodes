@@ -1,0 +1,105 @@
+package hadiEncoder;
+
+// Class to perform encoding and decoding using custom shift tables
+public class Encoderrr {
+	// Instance variables to store reference table and shift table
+	// Instance variables are fields declared within a class but outside any method
+	// A final variable, also called a “constant,” is a variable whose value you can't change after it's been initialized.
+    private final String referenceTable;
+    private final String shiftTable;
+
+    // Constructor to initialize reference table and shift table
+    // A constructor in Java is a special method that is used to initialize objects
+    public Encoderrr(String referenceTable, String shiftTable) {
+        this.referenceTable = referenceTable;
+        this.shiftTable = shiftTable;
+    }
+
+	/*
+	 * Method Declaration:
+	 * This method is declared as public, meaning it can be accessed from outside
+	 * the class. It returns a String, representing the encoded version of the input
+	 * plainText. It takes a single parameter, plainText, which is the text to be
+	 * encoded. 
+	 * 
+	 * StringBuilder Initialization:
+	 * A StringBuilder named encoded is initialized. StringBuilder is used to
+	 * efficiently build strings by appending characters. Iteration Through
+	 * Characters:
+	 * 
+	 * The method iterates through each character (c) in the plainText using a
+	 * for-each loop. Index Retrieval:
+	 * 
+	 * For each character, it retrieves the index of that character in the
+	 * referenceTable. This index indicates the position of the character in the
+	 * reference table. Encoding:
+	 * 
+	 * If the character exists in the referenceTable (i.e., index != -1), it means
+	 * it's a character that needs to be encoded. In this case: It retrieves the
+	 * corresponding character from the shiftTable using the same index. This
+	 * character from the shiftTable is appended to the encoded StringBuilder. If
+	 * the character does not exist in the referenceTable, it means it's a special
+	 * character that doesn't need encoding. In this case: The character remains
+	 * unchanged and is directly appended to the encoded StringBuilder. Return:
+	 * 
+	 * Finally, the encoded StringBuilder is converted to a string using the
+	 * toString() method and returned as the result of the encoding process.
+	 */
+    // Method to encode plain text using the shift table
+    public String encode(String plainText) {
+        StringBuilder encoded = new StringBuilder();
+        // Iterate through each character in the plain text
+        for (char c : plainText.toCharArray()) {
+            int index = referenceTable.indexOf(c); // Find the index of the character in the reference table
+            // If the character exists in the reference table, append its corresponding character from the shift table
+            if (index != -1) {
+                encoded.append(shiftTable.charAt(index));
+            } else {
+                encoded.append(c); // If the character is not in the reference table, keep it unchanged
+            }
+        }
+        return encoded.toString();
+    }
+
+    public String decode(String encodedText) {
+        StringBuilder decoded = new StringBuilder();
+        for (char c : encodedText.toCharArray()) {
+            int index = shiftTable.indexOf(c);
+            if (index != -1) {
+                decoded.append(referenceTable.charAt(index));
+            } else {
+                decoded.append(c); 
+            }
+        }
+        return decoded.toString();
+    }
+
+    // Main method to demonstrate the usage of the Encoder class
+    public static void main(String[] args) {
+    	// Define reference table and two shift tables based on the PDF given
+        String referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./";
+        String shiftTable1 = "/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-.";
+        String shiftTable2 = "+,-./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*";
+
+        // Create instances of the Encoder class with different shift tables
+        Encoderrr encoderDecoder1 = new Encoderrr(referenceTable, shiftTable1);
+        Encoderrr encoderDecoder2 = new Encoderrr(referenceTable, shiftTable2);
+
+        String plaintext = "HELLO WORLD";
+
+        // Encode and decode using Shift Table #1
+        String encodedMessage1 = encoderDecoder1.encode(plaintext);
+        String decodedMessage1 = encoderDecoder1.decode(encodedMessage1);
+
+        // Encode and decode using Shift Table #2
+        String encodedMessage2 = encoderDecoder2.encode(plaintext);
+        String decodedMessage2 = encoderDecoder2.decode(encodedMessage2);
+
+        // Print the results
+        System.out.println("Encoded message (Shift Table #1): " + encodedMessage1);
+        System.out.println("Decoded message (Shift Table #1): " + decodedMessage1);
+        System.out.println("Encoded message (Shift Table #2): " + encodedMessage2);
+        System.out.println("Decoded message (Shift Table #2): " + decodedMessage2);
+    }
+}
+

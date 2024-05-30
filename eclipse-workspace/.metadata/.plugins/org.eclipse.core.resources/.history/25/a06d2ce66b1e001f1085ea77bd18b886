@@ -1,0 +1,55 @@
+package hadiEncoder;
+
+public class Encode {
+
+	    private static final String referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()+,-.*";
+
+	    public String encode(String plainText, char offsetChar) {
+	        int offset = referenceTable.indexOf(offsetChar);
+	        StringBuilder encodedMessage = new StringBuilder();
+
+	        for (char c : plainText.toCharArray()) {
+	            int index = referenceTable.indexOf(c);
+	            if (index != -1) {
+	                int newIndex = (index + offset) % referenceTable.length();
+	                encodedMessage.append(referenceTable.charAt(newIndex));
+	            } else {
+	                encodedMessage.append(c);
+	            }
+	        }
+
+	        return offsetChar + " " + encodedMessage.toString();
+	    }
+
+	    public String decode(String encodedText) {
+	        char offsetChar = encodedText.charAt(0);
+	        int offset = referenceTable.indexOf(offsetChar);
+	        String encodedMessage = encodedText.substring(2);
+	        StringBuilder decodedMessage = new StringBuilder();
+
+	        for (char c : encodedMessage.toCharArray()) {
+	            int index = referenceTable.indexOf(c);
+	            if (index != -1) {
+	                int newIndex = (index - offset + referenceTable.length()) % referenceTable.length();
+	                decodedMessage.append(referenceTable.charAt(newIndex));
+	            } else {
+	                decodedMessage.append(c);
+	            }
+	        }
+
+	        return decodedMessage.toString();
+	    }
+
+	    public static void main(String[] args) {
+	    	Encode encoderDecoder = new Encode();
+
+	        // Example usage
+	        String plaintext = "HELLO WORLD";
+	        char offsetChar = 'B';
+	        String encodedMessage = encoderDecoder.encode(plaintext, offsetChar);
+	        System.out.println("Encoded message: " + encodedMessage);
+
+	        String decodedMessage = encoderDecoder.decode(encodedMessage);
+	        System.out.println("Decoded message: " + decodedMessage);
+	    }
+	}

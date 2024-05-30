@@ -1,0 +1,83 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Encode {
+    private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./";
+    private static final Map<Character, Integer> charToIndexMap = new HashMap<>();
+
+    static {
+        // Initialize the charToIndexMap
+        for (int i = 0; i < REFERENCE_TABLE.length(); i++) {
+            charToIndexMap.put(REFERENCE_TABLE.charAt(i), i);
+        }
+    }
+
+    public String encode(String plainText) {
+        if (plainText == null || plainText.isEmpty()) {
+            return "";
+        }
+
+        char offset = getOffset(plainText);
+        int offsetIndex = REFERENCE_TABLE.indexOf(offset);
+        StringBuilder encodedText = new StringBuilder();
+        encodedText.append(offset);
+
+        for (char c : plainText.toCharArray()) {
+            if (charToIndexMap.containsKey(c)) {
+                int index = (charToIndexMap.get(c) + offsetIndex) % REFERENCE_TABLE.length();
+                encodedText.append(REFERENCE_TABLE.charAt(index));
+            } else {
+                encodedText.append(c);
+            }
+        }
+
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText) {
+        if (encodedText == null || encodedText.isEmpty()) {
+            return "";
+        }
+
+        char offset = encodedText.charAt(0);
+        int offsetIndex = REFERENCE_TABLE.indexOf(offset);
+        StringBuilder plainText = new StringBuilder();
+
+        for (int i = 1; i < encodedText.length(); i++) {
+            char c = encodedText.charAt(i);
+            if (charToIndexMap.containsKey(c)) {
+                int index = (charToIndexMap.get(c) - offsetIndex + REFERENCE_TABLE.length()) % REFERENCE_TABLE.length();
+                plainText.append(REFERENCE_TABLE.charAt(index));
+            } else {
+                plainText.append(c);
+            }
+        }
+
+        return plainText.toString();
+    }
+
+    private char getOffset(String plainText) {
+        for (char c : plainText.toCharArray()) {
+            if (charToIndexMap.containsKey(c)) {
+                return c;
+            }
+        }
+        // If no character from the reference table is found, use 'A' as the default offset
+        return 'A';
+    }
+
+    public static void main(String[] args) {
+        Encode encoder = new Encode();
+
+        String plainText = "HELLO WORLD";
+        System.out.println("Plaintext: " + plainText);
+
+        String encodedText = encoder.encode(plainText);
+        System.out.println("Encoded text: " + encodedText);
+
+        String decodedText = encoder.decode(encodedText);
+        System.out.println("Decoded text: " + decodedText);
+    }
+}

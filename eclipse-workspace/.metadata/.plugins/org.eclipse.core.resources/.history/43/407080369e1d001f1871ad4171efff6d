@@ -1,0 +1,45 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+public class EncoderDecoder {
+    // Define the reference and shift tables
+    private static final char[] referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,:;()-!?$#'\"/[]".toCharArray();
+    private static final char[] shiftTable1 = "BCD3FGHIJKLMNOPQRSTUVWXYZ4A5678901 .,:;()-!?$#'\"/[".toCharArray();
+    private static final char[] shiftTable2 = "XYZABCDEFGHIJKLMNOPQRSTUVW3456789 .,:;()-!?$#'\"/[\\]^_`".toCharArray();
+    // Create mappings for encoding and decoding dictionaries
+    private static final Map<Character, Character> encodeMap = new HashMap<>();
+    private static final Map<Character, Character> decodeMap = new HashMap<>();
+    
+    static {
+        // Populate the encoding and decoding dictionaries
+        for (int i = 0; i < referenceTable.length; i++) {
+            encodeMap.put(referenceTable[i], shiftTable1[i]);
+            decodeMap.put(shiftTable1[i], referenceTable[i]);
+        }
+    }
+    // Method to encode text
+    public static String encode(String plainText) {
+        StringBuilder encodedMessage = new StringBuilder();
+        for (char c : plainText.toCharArray()) {
+            encodedMessage.append(encodeMap.getOrDefault(c, c));
+        }
+        return encodedMessage.toString();
+    }
+    // Method to decode text
+    public static String decode(String encodedText) {
+        StringBuilder decodedMessage = new StringBuilder();
+        for (char c : encodedText.toCharArray()) {
+            decodedMessage.append(decodeMap.getOrDefault(c, c));
+        }
+        return decodedMessage.toString();
+    }
+    public static void main(String[] args) {
+        // Testing the encode and decode functions
+        String plainText = "HELLO WORLD";
+        String encodedText = encode(plainText);
+        System.out.println("Encoded Text: " + encodedText);
+        String decodedText = decode(encodedText);
+        System.out.println("Decoded Text: " + decodedText);
+    }
+}

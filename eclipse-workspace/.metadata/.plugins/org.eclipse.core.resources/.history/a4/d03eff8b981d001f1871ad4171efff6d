@@ -1,0 +1,72 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class test2 {
+
+    // Define your index table (reference characters and shifts)
+    // Example: Map<Character, Integer> indexTable = new HashMap<>();
+    // indexTable.put('A', 3);
+    // indexTable.put('B', 6);
+    // ...
+
+    // Define your shift tables
+    // Example: String shiftTable1 = "BCDEFGHIJKLMNOPQRSTUVWXYZA";
+    // String shiftTable2 = "ZYXWVUTSRQPONMLKJIHGFEDCBA";
+
+    public static String encode(String plaintext, Map<Character, Integer> indexTable, String shiftTable) {
+        StringBuilder encoded = new StringBuilder();
+        for (char c : plaintext.toCharArray()) {
+            if (Character.isLetter(c)) {
+                char upperC = Character.toUpperCase(c);
+                int index = indexTable.get(upperC);
+                int shift = indexTable.get(upperC);
+                char encodedChar = shiftTable.charAt((index + shift) % shiftTable.length());
+                if (Character.isLowerCase(c)) {
+                    encodedChar = Character.toLowerCase(encodedChar);
+                }
+                encoded.append(encodedChar);
+            } else {
+                encoded.append(c);
+            }
+        }
+        return encoded.toString();
+    }
+
+    public static String decode(String encoded, Map<Character, Integer> indexTable, String shiftTable) {
+        StringBuilder decoded = new StringBuilder();
+        for (char c : encoded.toCharArray()) {
+            if (Character.isLetter(c)) {
+                char upperC = Character.toUpperCase(c);
+                int index = indexTable.get(upperC);
+                int shift = indexTable.get(upperC);
+                char decodedChar = shiftTable.charAt((index - shift + shiftTable.length()) % shiftTable.length());
+                if (Character.isLowerCase(c)) {
+                    decodedChar = Character.toLowerCase(decodedChar);
+                }
+                decoded.append(decodedChar);
+            } else {
+                decoded.append(c);
+            }
+        }
+        return decoded.toString();
+    }
+
+    public static void main(String[] args) {
+        // Example usage
+        Map<Character, Integer> indexTable = new HashMap<>();
+        // Fill in your index table here
+
+        String shiftTable1 = "BCDEFGHIJKLMNOPQRSTUVWXYZA";
+        String shiftTable2 = "ZYXWVUTSRQPONMLKJIHGFEDCBA";
+
+        String plaintext = "HELLO WORLD";
+        String encodedResult = encode(plaintext, indexTable, shiftTable1);
+        System.out.println("Encoded: " + encodedResult);
+
+        // Decoding is similar; just reverse the process
+        String decodedResult = decode(encodedResult, indexTable, shiftTable1);
+        System.out.println("Decoded: " + decodedResult);
+    }
+}

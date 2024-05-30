@@ -1,0 +1,55 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class CharacterShifters {
+
+    private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./"; // Reference table with 44 characters based on the pdf
+    private static final String SHIFT_TABLE_1 = "/ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-."; // Shift Table #1 for encoding based on the pdf
+    private static final String SHIFT_TABLE_2 = "+,-./ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*"; // Shift Table #2 for encoding based on the pdf
+
+    // Create a map for easy lookup of character indices
+    private static final Map<Character, Integer> charToIndex = new HashMap<>();
+    static {
+    	// Populate the map with characters and their corresponding indices from the reference table
+        for (int i = 0; i < REFERENCE_TABLE.length(); i++) {
+            charToIndex.put(REFERENCE_TABLE.charAt(i), i);
+        }
+    }
+
+    // Method to encode text using Shift Table 1
+    public static String encodeWithShiftTable1(String plainText) {
+        return encode(plainText, SHIFT_TABLE_1); // Call the encode helper method with Shift Table 1
+    }
+
+    // Method to encode text using Shift Table 2
+    public static String encodeWithShiftTable2(String plainText) {
+        return encode(plainText, SHIFT_TABLE_2); // Call the encode helper method with Shift Table 2
+    }
+
+    private static String encode(String plainText, String shiftTable) {
+        StringBuilder encodedText = new StringBuilder();
+        for (char c : plainText.toUpperCase().toCharArray()) {
+            if (charToIndex.containsKey(c)) {
+                int index = charToIndex.get(c);
+                char encodedChar = shiftTable.charAt(index);
+                encodedText.append(encodedChar);
+            } else {
+                encodedText.append(c); // Keep non-alphabetic characters unchanged
+            }
+        }
+        return encodedText.toString();
+    }
+
+    //This is the entry point of the program. It demonstrates encoding the input text using both shift tables and prints the results.
+    public static void main(String[] args) {
+        String input = "HELLO WORLD";
+        String encodedWithShiftTable1 = encodeWithShiftTable1(input);
+        String encodedWithShiftTable2 = encodeWithShiftTable2(input);
+
+        System.out.println("Input: " + input);
+        System.out.println("Encoded with Shift Table 1: " + encodedWithShiftTable1);
+        System.out.println("Encoded with Shift Table 2: " + encodedWithShiftTable2);
+    }
+}

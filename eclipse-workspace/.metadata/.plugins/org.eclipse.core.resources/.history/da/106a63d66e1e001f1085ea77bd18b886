@@ -1,0 +1,66 @@
+package hadiEncoder;
+
+public class CharacterShifter {
+    private final String referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()+-.*,";
+
+    public String encode(String plainText, char offsetChar) {
+        StringBuilder encodedText = new StringBuilder();
+        int offset = referenceTable.indexOf(offsetChar);
+
+        for (char c : plainText.toCharArray()) {
+            int index = referenceTable.indexOf(c);
+            if (index != -1) {
+                int shiftedIndex = (index + offset) % referenceTable.length();
+                encodedText.append(referenceTable.charAt(shiftedIndex));
+            } else {
+                // Character not in reference table, keep it unchanged
+                encodedText.append(c);
+            }
+        }
+
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText, char offsetChar) {
+        StringBuilder plainText = new StringBuilder();
+        int offset = referenceTable.indexOf(offsetChar);
+
+        for (char c : encodedText.toCharArray()) {
+            int index = referenceTable.indexOf(c);
+            if (index != -1) {
+                int shiftedIndex = (index - offset + referenceTable.length()) % referenceTable.length();
+                plainText.append(referenceTable.charAt(shiftedIndex));
+            } else {
+                // Character not in reference table, keep it unchanged
+                plainText.append(c);
+            }
+        }
+
+        return plainText.toString();
+    }
+
+    public static void main(String[] args) {
+    	CharacterShifter encoderDecoder = new CharacterShifter();
+
+        String plainText = "HELLO WORLD";
+        char offsetChar1 = 'B';
+        char offsetChar2 = 'F';
+
+        String encodedText1 = encoderDecoder.encode(plainText, offsetChar1);
+        String decodedText1 = encoderDecoder.decode(encodedText1, offsetChar1);
+
+        String encodedText2 = encoderDecoder.encode(plainText, offsetChar2);
+        String decodedText2 = encoderDecoder.decode(encodedText2, offsetChar2);
+
+        System.out.println("Offset B:");
+        System.out.println("Encoded: " + encodedText1);
+        System.out.println("Decoded: " + decodedText1);
+
+        System.out.println("\nOffset F:");
+        System.out.println("Encoded: " + encodedText2);
+        System.out.println("Decoded: " + decodedText2);
+    }
+}
+
+
+

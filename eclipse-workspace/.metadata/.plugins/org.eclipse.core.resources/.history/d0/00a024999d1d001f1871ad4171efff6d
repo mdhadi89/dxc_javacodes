@@ -1,0 +1,110 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class EncoderDecoder {
+    private final char[] referenceTable = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'};
+    private final char[] shiftTable1 = {'/', ',', '-', '.', '/', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+'};
+    private final char[] shiftTable2 = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'};
+
+    public String encode(String plainText, char offsetChar) {
+        StringBuilder encodedText = new StringBuilder();
+
+        // Find index of offset character in reference table
+        int offsetIndex = -1;
+        for (int i = 0; i < referenceTable.length; i++) {
+            if (referenceTable[i] == offsetChar) {
+                offsetIndex = i;
+                break;
+            }
+        }
+
+        if (offsetIndex == -1) {
+            // Offset character not found in reference table
+            return plainText;
+        }
+
+        // Use the appropriate shift table based on the offset character
+        char[] shiftTable = (offsetChar == 'B') ? shiftTable1 : shiftTable2;
+
+        for (char c : plainText.toCharArray()) {
+            int index = -1;
+            for (int i = 0; i < referenceTable.length; i++) {
+                if (referenceTable[i] == c) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) {
+                encodedText.append(shiftTable[(index + offsetIndex) % referenceTable.length]);
+            } else {
+                // Character not found in reference table, keep it unchanged
+                encodedText.append(c);
+            }
+        }
+
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText, char offsetChar) {
+        StringBuilder decodedText = new StringBuilder();
+
+        // Find index of offset character in reference table
+        int offsetIndex = -1;
+        for (int i = 0; i < referenceTable.length; i++) {
+            if (referenceTable[i] == offsetChar) {
+                offsetIndex = i;
+                break;
+            }
+        }
+
+        if (offsetIndex == -1) {
+            // Offset character not found in reference table
+            return encodedText;
+        }
+
+        // Use the appropriate shift table based on the offset character
+        char[] shiftTable = (offsetChar == 'B') ? shiftTable1 : shiftTable2;
+
+        for (char c : encodedText.toCharArray()) {
+            int index = -1;
+            for (int i = 0; i < shiftTable.length; i++) {
+                if (shiftTable[i] == c) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index != -1) {
+                int originalIndex = (index - offsetIndex + referenceTable.length) % referenceTable.length;
+                decodedText.append(referenceTable[originalIndex]);
+            } else {
+                // Character not found in shift table, keep it unchanged
+                decodedText.append(c);
+            }
+        }
+
+        return decodedText.toString();
+    }
+
+    public static void main(String[] args) {
+        EncoderDecoder encoderDecoder = new EncoderDecoder();
+        String plainText = "HELLO WORLD";
+
+        // Encode with offset character B
+        String encodedTextB = encoderDecoder.encode(plainText, 'B');
+        System.out.println("Encoded with offset B: " + encodedTextB);
+
+        // Decode with offset character B
+        String decodedTextB = encoderDecoder.decode(encodedTextB, 'B');
+        System.out.println("Decoded with offset B: " + decodedTextB);
+
+        // Encode with offset character F
+        String encodedTextF = encoderDecoder.encode(plainText, 'F');
+        System.out.println("Encoded with offset F: " + encodedTextF);
+
+        // Decode with offset character F
+        String decodedTextF = encoderDecoder.decode(encodedTextF, 'F');
+        System.out.println("Decoded with offset F: " + decodedTextF);
+    }
+}

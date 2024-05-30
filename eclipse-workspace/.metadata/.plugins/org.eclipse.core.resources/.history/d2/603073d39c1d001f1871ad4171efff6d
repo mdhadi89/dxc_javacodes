@@ -1,0 +1,83 @@
+package hadiEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class EncoderDecoder {
+    // Reference table
+    private static final char[] REFERENCE_TABLE = {
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '*', '+', ',', '-', '.', '/'
+    };
+
+    // Maps for quick lookup
+    private static final Map<Character, Integer> charToIndexMap = new HashMap<>();
+    private static final Map<Integer, Character> indexToCharMap = new HashMap<>();
+
+    static {
+        for (int i = 0; i < REFERENCE_TABLE.length; i++) {
+            charToIndexMap.put(REFERENCE_TABLE[i], i);
+            indexToCharMap.put(i, REFERENCE_TABLE[i]);
+        }
+    }
+    
+    public String encode(String plainText, char offsetChar) {
+        if (!charToIndexMap.containsKey(offsetChar)) {
+            throw new IllegalArgumentException("Offset character must be in the reference table.");
+        }
+        int offset = charToIndexMap.get(offsetChar);
+        StringBuilder encodedText = new StringBuilder();
+        encodedText.append(offsetChar); // First character is the offset
+
+        for (char c : plainText.toCharArray()) {
+            if (charToIndexMap.containsKey(c)) {
+                int originalIndex = charToIndexMap.get(c);
+                int newIndex = (originalIndex + offset) % REFERENCE_TABLE.length;
+                encodedText.append(indexToCharMap.get(newIndex));
+            } else {
+                // Characters not in the reference table remain the same
+                encodedText.append(c);
+            }
+        }
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText) {
+        if (encodedText == null || encodedText.isEmpty()) {
+            throw new IllegalArgumentException("Encoded text cannot be null or empty.");
+        }
+        char offsetChar = encodedText.charAt(0);
+        if (!charToIndexMap.containsKey(offsetChar)) {
+            throw new IllegalArgumentException("Offset character must be in the reference table.");
+        }
+        int offset = charToIndexMap.get(offsetChar);
+        StringBuilder decodedText = new StringBuilder();
+
+        for (int i = 1; i < encodedText.length(); i++) {
+            char c = encodedText.charAt(i);
+            if (charToIndexMap.containsKey(c)) {
+                int encodedIndex = charToIndexMap.get(c);
+                int originalIndex = (encodedIndex - offset + REFERENCE_TABLE.length) % REFERENCE_TABLE.length;
+                decodedText.append(indexToCharMap.get(originalIndex));
+            } else {
+                // Characters not in the reference table remain the same
+                decodedText.append(c);
+            }
+        }
+        return decodedText.toString();
+    }
+
+    public static void main(String[] args) {
+        EncoderDecoder encoderDecoder = new EncoderDecoder();
+        String plainText = "HELLO WORLD";
+        char offsetChar = 'B';
+        
+        // Encoding
+        String encodedText = encoderDecoder.encode(plainText, offsetChar);
+        System.out.println("Encoded Text: " + encodedText);
+
+        // Decoding
+        String decodedText = encoderDecoder.decode(encodedText);
+        System.out.println("Decoded Text: " + decodedText);
+    }
+}

@@ -1,0 +1,75 @@
+package hadiEncoder;
+
+import java.util.Scanner;
+
+public class EncoderDecoder {
+	private static final String REFERENCE_TABLE = "0ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789()+-*/.,";
+    private static final int TABLE_SIZE = REFERENCE_TABLE.length();
+
+    // Method to encode the plaintext
+    public String encode(String plainText, char offsetChar) {
+        int offset = getOffset(offsetChar);
+        StringBuilder encodedText = new StringBuilder();
+
+        for (char c : plainText.toCharArray()) {
+            int index = REFERENCE_TABLE.indexOf(c);
+            if (index != -1) {
+                int newIndex = (index + offset) % TABLE_SIZE;
+                encodedText.append(REFERENCE_TABLE.charAt(newIndex));
+            } else {
+                encodedText.append(c);
+            }
+        }
+
+        encodedText.insert(0, offsetChar); // Insert the offset character at the beginning
+        return encodedText.toString();
+    }
+
+    // Method to decode the encoded text
+    public String decode(String encodedText) {
+        char offsetChar = encodedText.charAt(0);
+        int offset = getOffset(offsetChar);
+        StringBuilder decodedText = new StringBuilder();
+
+        for (int i = 1; i < encodedText.length(); i++) {
+            char c = encodedText.charAt(i);
+            int index = REFERENCE_TABLE.indexOf(c);
+            if (index != -1) {
+                int newIndex = (index - offset + TABLE_SIZE) % TABLE_SIZE;
+                decodedText.append(REFERENCE_TABLE.charAt(newIndex));
+            } else {
+                decodedText.append(c);
+            }
+        }
+
+        return decodedText.toString();
+    }
+
+    // Helper method to get the offset from the offset character
+    private int getOffset(char offsetChar) {
+        return REFERENCE_TABLE.indexOf(offsetChar);
+    }
+
+    public static void main(String[] args) {
+        EncoderDecoder encoderDecoder = new EncoderDecoder();
+        Scanner scanner = new Scanner(System.in);
+
+        // Get user input for plain text
+        System.out.print("Enter plain text: ");
+        String plainText = scanner.nextLine();
+
+        // Get user input for offset character
+        System.out.print("Enter offset character: ");
+        char offsetChar = scanner.next().charAt(0);
+
+        // Encode the plain text
+        String encodedText = encoderDecoder.encode(plainText, offsetChar);
+        System.out.println("Encoded Text: " + encodedText);
+
+        // Decode the encoded text
+        String decodedText = encoderDecoder.decode(encodedText);
+        System.out.println("Decoded Text: " + decodedText);
+
+        scanner.close();
+    }
+}

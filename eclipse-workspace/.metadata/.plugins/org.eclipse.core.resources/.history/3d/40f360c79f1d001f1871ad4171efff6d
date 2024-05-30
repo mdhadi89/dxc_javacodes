@@ -1,0 +1,69 @@
+package hadiEncoder;
+
+public class EncoderDecoder {
+    private static final String referenceTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()*+,-./";
+    private static final int tableLength = referenceTable.length();
+
+    public String encode(String plainText, char offsetChar) {
+        int offset = referenceTable.indexOf(offsetChar);
+        StringBuilder encodedText = new StringBuilder();
+
+        for (char c : plainText.toCharArray()) {
+            if (c == ' ') {
+                encodedText.append(' '); // Keep spaces unchanged
+                continue;
+            }
+            int index = referenceTable.indexOf(c);
+            if (index != -1) {
+                int shiftedIndex = (index + offset) % tableLength;
+                encodedText.append(referenceTable.charAt(shiftedIndex));
+            } else {
+                encodedText.append(c); // Keep non-reference characters unchanged
+            }
+        }
+
+        return encodedText.toString();
+    }
+
+    public String decode(String encodedText, char offsetChar) {
+        int offset = referenceTable.indexOf(offsetChar);
+        StringBuilder decodedText = new StringBuilder();
+
+        for (char c : encodedText.toCharArray()) {
+            if (c == ' ') {
+                decodedText.append(' '); // Keep spaces unchanged
+                continue;
+            }
+            int index = referenceTable.indexOf(c);
+            if (index != -1) {
+                int shiftedIndex = (index - offset + tableLength) % tableLength;
+                decodedText.append(referenceTable.charAt(shiftedIndex));
+            } else {
+                decodedText.append(c); // Keep non-reference characters unchanged
+            }
+        }
+
+        return decodedText.toString();
+    }
+
+    public static void main(String[] args) {
+        EncoderDecoder encoderDecoder = new EncoderDecoder();
+
+        // Example usage with offset character 'B'
+        String plainText = "HELLO WORLD";
+        char offsetChar = 'B'; // Using 'B' as the offset character
+        String encodedText = encoderDecoder.encode(plainText, offsetChar);
+        System.out.println("Encoded Text with Offset Character 'B': " + encodedText);
+
+        String decodedText = encoderDecoder.decode(encodedText, offsetChar);
+        System.out.println("Decoded Text with Offset Character 'B': " + decodedText);
+        
+        // Example usage with offset character 'F'
+        offsetChar = 'F'; // Using 'F' as the offset character
+        encodedText = encoderDecoder.encode(plainText, offsetChar);
+        System.out.println("\nEncoded Text with Offset Character 'F': " + encodedText);
+
+        decodedText = encoderDecoder.decode(encodedText, offsetChar);
+        System.out.println("Decoded Text with Offset Character 'F': " + decodedText);
+    }
+}
