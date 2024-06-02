@@ -46,13 +46,8 @@ function validate()
 				If there is no error message (request.getAttribute("errMessage") == null), the expression outputs an empty string, and nothing is displayed in the table cell.
 				If there is an error message (request.getAttribute("errMessage") != null), the value of the "errMessage" attribute is displayed in the table cell in red text. 
 		 -->
-<%-- 		 <td><span style="color:red"><%=(request.getAttribute("errMessage") == null) ? ""
-		 : request.getAttribute("errMessage")%></span></td> --%>
-		 <td>
-  			<span style="color:red">
-    			<%= request.getAttribute("errMessage") != null ? request.getAttribute("errMessage") : "" %>
-  			</span>
-		</td>
+		 <td><span style="color:red"><%=(request.getAttribute("errMessage") == null) ? ""
+		 : request.getAttribute("errMessage")%></span></td>
 		 </tr>
 		 <tr>
 		 <td></td>

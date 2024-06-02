@@ -38,21 +38,9 @@ function validate()
 		 <td>Password</td>
 		 <td><input type="password" name="password" /></td>
 		 </tr>
-		 <tr>
-		 <!--Purpose:
-				This JSP code is designed to display an error message in a web page if there is an error. The error message is stored as an attribute in the HTTP request under the name "errMessage".
-			 Behavior:
-				When the JSP page is processed by the server, it evaluates whether there is an "errMessage" attribute in the request.
-				If there is no error message (request.getAttribute("errMessage") == null), the expression outputs an empty string, and nothing is displayed in the table cell.
-				If there is an error message (request.getAttribute("errMessage") != null), the value of the "errMessage" attribute is displayed in the table cell in red text. 
-		 -->
-<%-- 		 <td><span style="color:red"><%=(request.getAttribute("errMessage") == null) ? ""
-		 : request.getAttribute("errMessage")%></span></td> --%>
-		 <td>
-  			<span style="color:red">
-    			<%= request.getAttribute("errMessage") != null ? request.getAttribute("errMessage") : "" %>
-  			</span>
-		</td>
+		 <tr> <!-- refer to the video to understand request.getAttribute() -->
+		 <td><span style="color:red"><%=(request.getAttribute("errMessage") == null) ? ""
+		 : request.getAttribute("errMessage")%></span></td>
 		 </tr>
 		 <tr>
 		 <td></td>
